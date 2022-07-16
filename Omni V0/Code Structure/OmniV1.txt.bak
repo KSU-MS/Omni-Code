@@ -1,0 +1,11 @@
+struct psudoPacket // 16 bytes (128 bits)
+{
+    uint32_t timestamp; // 32 bits (Time)
+    uint16_t id;        // 16 bits (Param ID)
+    byte data[8];   // 64 bits (Data)
+    uint16_t delim;     // 16 bits (Delimiter between frames)
+};
+
+const word PSUDO_PACKET_DELIM = 0b1010101010101010;
+
+psudoPacket packet = {timestamp : millis(), id : 10000, data : {0x1,0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8}, delim : PSUDO_PACKET_DELIM};
