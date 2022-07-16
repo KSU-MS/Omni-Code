@@ -6,19 +6,19 @@
 
 #include "Radio.h"
 
-// LED outputs
+// LED outputs (UNUSED)
 #define LED_R 20
 #define LED_G 21
 #define LED_B 22
 
-// Voltage reading pin (For power loss detection)
+// Voltage reading pin (For power loss detection) (TO DO)
 #define V_SENSE 18
 
-// Can chip
+// Can chip (UPDATE PINS)
 #define CAN_CS 15
 #define CAN_IRQ 14
 
-// Radio chip
+// Radio chip (UPDATE & REPLACE)
 #define RADIO_CS 31
 #define RADIO_CE 36
 #define RADIO_INT 35
@@ -26,9 +26,9 @@
 
 Buffer buffer = Buffer();
 Card card = Card();
-LED led = LED(LED_R, LED_G, LED_B);
+LED led = LED(LED_R, LED_G, LED_B); //(UPDATE DISPLAY STATES)
 CanNetwork can = CanNetwork(CAN_CS);
-Radio radio = Radio(RADIO_CE, RADIO_CS);
+Radio radio = Radio(RADIO_CE, RADIO_CS);  //(UPDAE & REPLACE)
 
 #define debug_mode true
 
@@ -36,7 +36,7 @@ void setup()
 {
 
   noInterrupts();
-  led.setColor(255, 100, 0);
+  led.setColor(255, 100, 0);  //UPDATE TO LED
 
   if (debug_mode)
   {
@@ -52,12 +52,12 @@ void setup()
     Serial.println("Debug mode on.");
 
     Serial.print("RTC TIME: ");
-    Serial.println(Teensy3Clock.get());
+    Serial.println(Teensy3Clock.get()); //(UPDATE)
 
     //    buffer.debug();
     //    card.debug();
 //        can.debug();
-    radio.debug();
+    radio.debug();  //(DISABLE)
   }
 
   // Init CAN system
@@ -67,7 +67,7 @@ void setup()
   // Init SD Card
   if (!card.init(BUILTIN_SDCARD)){
     Serial.println("Error initializing SD card controller");
-    led.errorTrap(SD_CARD_ERROR);
+    led.errorTrap(SD_CARD_ERROR); //INVESTAGATE
   }
 
   // Create 1MB file (Will create new ones if we exceed this)
@@ -76,6 +76,8 @@ void setup()
 
 
   // Init Radio
+
+  /*
   if (!radio.init(RADIO_ADDRESS, &SPI1))
     Serial.println("Error initializing radio transmitter");
   else
@@ -83,6 +85,9 @@ void setup()
 
 
   delay(1000);
+  */
+
+
   // CAN Inturrupt registration
   pinMode(CAN_IRQ, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(CAN_IRQ), recievePacket, LOW);
@@ -93,7 +98,7 @@ void setup()
   noInterrupts();
 
   Serial.println("Setup complete.");
-  led.clear();
+  led.clear();  //(UPDATE)
 
   interrupts();
 }
@@ -103,12 +108,12 @@ volatile int packets = 0;
 void recievePacket()
 {
 if(power_down) return;
-  led.setColor(0, 0, 255);
+  led.setColor(0, 0, 255); //(UPDATE)
   CanPacket incoming = can.receive();
   if(!system_ready) return;
   if (incoming.timestamp != 0)
   {
-    radio.send(&incoming);
+    radio.send(&incoming); //DISABLE
     buffer.push(incoming);
     packets++;
   }
@@ -124,7 +129,7 @@ unsigned long last = 0;
 void loop()
 {
 if(power_down) {
-    led.setColor(0, 255, 0);
+    led.setColor(0, 255, 0); //UPDATE
     return;
 }
   system_ready = true;
@@ -132,7 +137,7 @@ if(power_down) {
   while (buffer.blockReady())
   {
 
-    led.setColor(0, 255, 0);
+    led.setColor(0, 255, 0); //UPDATE
     card.writeBlock(buffer.peek());
     buffer.pop();
   }
@@ -142,6 +147,6 @@ if(power_down) {
     last = millis();
     packets = 0;
   }
-  led.clear();
+  led.clear(); //UPDATE
   //  led.tick(millis());
 }

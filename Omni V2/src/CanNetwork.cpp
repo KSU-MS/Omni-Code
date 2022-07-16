@@ -1,6 +1,6 @@
 
 #include "CanNetwork.h"
-
+#include "Arduino.h"
 // The pin here is the board select pin to SPI sometimes marked (SS)
 // Note: you can make this any pin, as long as it's connected to the MCP chip's SS
 CanNetwork::CanNetwork(int pin) : _CAN(new MCP_CAN(pin))
@@ -15,7 +15,7 @@ void CanNetwork::debug()
 void CanNetwork::init(uint8_t speed)
 {
 
-label: START_INIT
+START_INIT:
     // Over 256 seems to break some boards
     if (CAN_OK == _CAN->begin(speed))
     {
