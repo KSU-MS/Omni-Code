@@ -9,7 +9,7 @@ class CanNetwork
 {
 public:
     CanNetwork(int pin);
-    void init(uint8_t speed);
+    bool init(uint8_t speed); //return FALSE if NOT FAILED, return TRUE if FAILED
     void send(CanPacket* packet);
     void debug();
     CanPacket receive();

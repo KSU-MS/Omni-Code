@@ -12,23 +12,24 @@ void CanNetwork::debug()
 {
     _debug = true;
 }
-void CanNetwork::init(uint8_t speed)
+bool CanNetwork::init(uint8_t speed)
 {
-
-START_INIT:
-    // Over 256 seems to break some boards
-    if (CAN_OK == _CAN->begin(speed))
-    {
-        if (_debug)
-            Serial.println("CAN BUS Shield init ok!");
-    }
-    else
-    {
-        Serial.println("CAN BUS Shield init fail");
-        Serial.println("Init CAN BUS Shield again");
-        delay(10);
-        goto START_INIT;
-    }
+    return (_CAN->begin(speed));
+// START_INIT:
+//     // Over 256 seems to break some boards
+//     if (CAN_OK == _CAN->begin(speed))
+//     {
+//         if (_debug)
+//             Serial.println("CAN BUS Shield init ok!");
+//     }
+//     else
+//     {
+//         Serial.println("CAN BUS Shield init fail");
+//         Serial.println("Init CAN BUS Shield again");
+//         delay(10);
+        
+//         goto START_INIT;
+//     }
 }
 // This is a testing mode the mcp cards can do where they recieve everything they send (loopback)
 void CanNetwork::loopback()
