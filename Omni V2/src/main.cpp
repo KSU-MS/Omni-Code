@@ -89,7 +89,6 @@ void setup(){
   card.openFile(10);
 // Init Radio (xbee go here)
   delay(1000);
-  //   */
   // CAN Inturrupt registration
   pinMode(CAN_IRQ, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(CAN_IRQ), recievePacket, LOW); 
@@ -109,12 +108,12 @@ void recievePacket()
   led.setColor(0, 0, 255); //(UPDATE)
   CanPacket incoming = can.receive();
   if(!system_ready) return;
-//  if (incoming.timestamp != 0)
-  //{
-    // radio.send(&incoming); //DISABLED
-    // buffer.push(incoming);
-    // packets++;
-  //}
+ if (incoming.timestamp != 0)
+  {
+    //radio.send(&incoming); //DISABLED
+    buffer.push(incoming);
+    packets++;
+  }
 }
 void powerDown()
 {
