@@ -15,18 +15,18 @@
 #define V_SENSE 18 //TODO implement hardware capability and update pin #
 
 // Can chip (UPDATE PINS)
-#define CAN_CS 15 //TODO update with actual pin on board
+#define CAN_CS 10 //TODO update with actual pin on board
 #define CAN_IRQ 14
 #define MAX_ATTEMPTS 69 
 // Radio chip (UPDATE & REPLACE)
-#define RADIO_CS 31
-#define RADIO_CE 36
-#define RADIO_INT 35
-#define RADIO_ADDRESS "00001" //TODO replace with xbee stuff
+//#define RADIO_CS 31
+//#define RADIO_CE 36
+//#define RADIO_INT 35
+//#define RADIO_ADDRESS "00001" //TODO replace with xbee stuff
 
 Buffer buffer = Buffer();
 Card card = Card();
-LED led = LED(LED_R, LED_G, LED_B); //TODO change to neopixel object with minimal code strucure changes
+//LED led = LED(LED_R, LED_G, LED_B); //TODO change to neopixel object with minimal code strucure changes
 CanNetwork can = CanNetwork(CAN_CS);
 //Radio radio = Radio(RADIO_CE, RADIO_CS);  //TODO xbees 
 //Global Var Defines
@@ -47,7 +47,7 @@ void setup(){
   digitalWrite(LED_BUILTIN,LOW);
   //cant call "nointerrupts" if _NO INTERRUPTS HAVE BEEN SET yet_
   //noInterrupts();
-  led.setColor(255, 100, 0);  //UPDATE TO LED
+  //led.setColor(255, 100, 0);  //UPDATE TO LED
 #if (debug_mode)
     Serial.begin(115200);
     // Wait for slow serial on the teensy, but only for 5 seconds max
@@ -65,7 +65,7 @@ void setup(){
   int initAttempts=1;
   // Init CAN system
   
-  while(can.init(CAN_250KBPS)){ //slow ass CAN lmao
+  while(can.init(CAN_500KBPS)){ //slow ass CAN lmao
 #if (debug_mode)
     Serial.printf("CAN init failed! Reattempting try #: %d\n",initAttempts);
  #endif
@@ -82,7 +82,7 @@ void setup(){
   // Init SD Card
   if (!card.init(10)){
     Serial.println("Error initializing SD card controller");
-    led.errorTrap(SD_CARD_ERROR); //this will lock omni in fault state if no SD
+    //led.errorTrap(SD_CARD_ERROR); //this will lock omni in fault state if no SD
   }
 
   // Create 1MB file (Will create new ones if we exceed this)
@@ -98,14 +98,14 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(V_SENSE), powerDown, FALLING); //falling edge on power rail sense pin will call powerDown() function
   noInterrupts();
   Serial.println("Setup complete.");
-  led.clear();  //(UPDATE)
+  //led.clear();  //(UPDATE)
   interrupts();
 }
 
 void recievePacket()
 {
   if(power_down) return;
-  led.setColor(0, 0, 255); //(UPDATE)
+  //led.setColor(0, 0, 255); //(UPDATE)
   CanPacket incoming = can.receive();
   if(!system_ready) return;
  if (incoming.timestamp != 0)
@@ -128,7 +128,7 @@ void loop(){
 //   return;
 // }
   system_ready = true;
-
+  recievePacket();
   while (buffer.blockReady())
   {
 

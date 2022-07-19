@@ -1,6 +1,69 @@
 
 #include "LED.h"
 #include "Arduino.h"
+#define Pin 2
+#define NumPixels 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 LED::LED(byte r, byte g, byte b)
 {
   _r = r;
@@ -68,3 +131,4 @@ void LED::set_blink_sequence(vector<pair<int, RGB>> sequence)
   _blink_index = 0;
   _blinking = true;
 }
+*/

@@ -1,10 +1,10 @@
 #ifndef LED_h
 #define LED_h
-#include <Arduino.h>
 #include <iostream>
 #include <vector>
 #include <utility>
 #include "Arduino.h"
+#include "Adafruit_NeoPixel.h"
 using namespace std;
 
 struct RGB
