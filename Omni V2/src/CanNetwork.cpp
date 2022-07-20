@@ -1,6 +1,7 @@
 
 #include "CanNetwork.h"
 #include "Arduino.h"
+
 // The pin here is the board select pin to SPI sometimes marked (SS)
 // Note: you can make this any pin, as long as it's connected to the MCP chip's SS
 CanNetwork::CanNetwork(int pin) : _CAN(new MCP_CAN(pin))
@@ -70,7 +71,7 @@ CanPacket CanNetwork::receive()
         received.timestamp =  millis();
         uint8_t message_length_bytes;
         _CAN->readMsgBuf(&message_length_bytes, received.data); // read data,  len: data length, buf: data buf
-
+        
         if (_debug)
         {
 

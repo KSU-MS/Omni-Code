@@ -1,14 +1,39 @@
 
-#include "LED.h"
+#include "KSULED.h"
 #include "Arduino.h"
-#define Pin 2
-#define NumPixels 2
 
+Adafruit_NeoPixel LEDs(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
+LED::LED(){
 
+}
 
+void LED::startUp(byte brightness)
+{
+  LEDs.begin();
+  LEDs.setBrightness(brightness);
+  LEDs.setPixelColor(1,LEDs.Color(0,0,255));
+  LEDs.show();
+}
 
+void LED::setColor(byte r,byte g, byte b,byte select)
+{
+  LEDs.setPixelColor(select,LEDs.Color(r,g,b));
+  LEDs.show();
+}
 
+void LED::clear()
+{
+  LEDs.clear();
+}
+
+void LED::blink(byte r, byte g, byte b, byte select)
+{
+  LEDs.setPixelColor(select,LEDs.Color(r,g,b));
+  LEDs.show();
+  delay(100);
+  LEDs.clear();
+}
 
 
 

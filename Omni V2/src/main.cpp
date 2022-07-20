@@ -1,15 +1,10 @@
-#include "LED.h" //would rename to KSULED.h to avoid conflicts
+#include "KSULED.h" //would rename to KSULED.h to avoid conflicts
 #include "KSUBuffer.h" //renamed to avoid conflicts
 #include "Card.h" //would rename to "KSUCard.h" to avoid conflicts
 #include "ErrorCodes.h "
 #include "CanNetwork.h"
 #include "Arduino.h"
 //#include "Radio.h"
-
-// LED outputs (UNUSED)
-#define LED_R 20 //TODO replace with neopixel defines (malloc and pin, etc)
-#define LED_G 21
-#define LED_B 22
 
 // Voltage reading pin (For power loss detection) (TODO)
 #define V_SENSE 18 //TODO implement hardware capability and update pin #
@@ -23,10 +18,9 @@
 //#define RADIO_CE 36
 //#define RADIO_INT 35
 //#define RADIO_ADDRESS "00001" //TODO replace with xbee stuff
-
+LED led = LED();
 Buffer buffer = Buffer();
 Card card = Card();
-//LED led = LED(LED_R, LED_G, LED_B); //TODO change to neopixel object with minimal code strucure changes
 CanNetwork can = CanNetwork(CAN_CS);
 //Radio radio = Radio(RADIO_CE, RADIO_CS);  //TODO xbees 
 //Global Var Defines
@@ -40,14 +34,15 @@ unsigned long last = 0;
 #define SERIAL_TIMEOUT 5000
 void recievePacket(); //have to define methods before they are called because vscode 
 void powerDown();
+
 void setup(){
-  pinMode(LED_BUILTIN,OUTPUT);
-  digitalWrite(LED_BUILTIN,HIGH);
-  delay(1000);
-  digitalWrite(LED_BUILTIN,LOW);
+  //pinMode(LED_BUILTIN,OUTPUT);
+  //digitalWrite(LED_BUILTIN,HIGH);
+  //digitalWrite(LED_BUILTIN,LOW);
   //cant call "nointerrupts" if _NO INTERRUPTS HAVE BEEN SET yet_
   //noInterrupts();
-  //led.setColor(255, 100, 0);  //UPDATE TO LED
+  led.startUp(50);
+  delay(1000);
 #if (debug_mode)
     Serial.begin(115200);
     // Wait for slow serial on the teensy, but only for 5 seconds max
@@ -65,13 +60,16 @@ void setup(){
   int initAttempts=1;
   // Init CAN system
   
-  while(can.init(CAN_500KBPS)){ //slow ass CAN lmao
+  while(can.init(CAN_1000KBPS)){
 #if (debug_mode)
+    led.blink(0,255,0,0);
     Serial.printf("CAN init failed! Reattempting try #: %d\n",initAttempts);
+
  #endif
     initAttempts++; delay(10); //
     if(initAttempts>=MAX_ATTEMPTS){
       Serial.println("Maxed out CAN attempts, breaking..."); //too lazy to put in debug #ifs, should make serial wrapper for debug mode
+      led.setColor(0,255,0,0);
       break;
     }
 
@@ -82,6 +80,7 @@ void setup(){
   // Init SD Card
   if (!card.init(10)){
     Serial.println("Error initializing SD card controller");
+    led.setColor(1,255,0,0);
     //led.errorTrap(SD_CARD_ERROR); //this will lock omni in fault state if no SD
   }
 
@@ -98,14 +97,14 @@ void setup(){
   attachInterrupt(digitalPinToInterrupt(V_SENSE), powerDown, FALLING); //falling edge on power rail sense pin will call powerDown() function
   noInterrupts();
   Serial.println("Setup complete.");
-  //led.clear();  //(UPDATE)
+  led.setColor(0,0,255,0);
   interrupts();
 }
 
 void recievePacket()
 {
   if(power_down) return;
-  //led.setColor(0, 0, 255); //(UPDATE)
+  led.blink(0,0,0,255);
   CanPacket incoming = can.receive();
   if(!system_ready) return;
  if (incoming.timestamp != 0)
@@ -131,8 +130,7 @@ void loop(){
   recievePacket();
   while (buffer.blockReady())
   {
-
-    // led.setColor(0, 255, 0); //UPDATE
+    led.blink(1,0,255,0);
     card.writeBlock(buffer.peek());
     buffer.pop();
   }
@@ -142,6 +140,5 @@ void loop(){
     last = millis();
     packets = 0;
   }
-  // led.clear(); //UPDATE
-  // led.tick(millis());
+ 
 }

@@ -1,5 +1,5 @@
-#ifndef LED_h
-#define LED_h
+#ifndef KSULED_h
+#define KSULED_h
 #include <iostream>
 #include <vector>
 #include <utility>
@@ -7,26 +7,35 @@
 #include "Adafruit_NeoPixel.h"
 using namespace std;
 
-struct RGB
-{
-    byte r;
-    byte b;
-    byte g;
-};
+#define NUMPIXELS 2
+#define PIN 2
+
+
 
 class LED
 {
 public:
-    LED(byte r, byte g, byte b);
-    void setColor(byte r, byte g, byte b);
-    void setColor(RGB rgb);
+    LED();
+    void setColor(byte r, byte g, byte b,byte select);
+    //void setColor();
     void clear();
-    void error();
-    void errorTrap(int code);
-    void tick(unsigned long t);
-
+   // void error();
+   // void errorTrap(int code);
+    void blink(byte r, byte g, byte b, byte select);
+    void startUp(byte brightness);
 private:
-    byte _r;
+
+
+void tick();
+
+
+
+
+
+
+
+
+/*  byte _r;
     byte _b;
     byte _g;
 
@@ -35,6 +44,7 @@ private:
     vector<pair<int, RGB>> _blink_sequence;
     unsigned int _blink_index;
     int _next_tick;
+    */
 };
 
 #endif
