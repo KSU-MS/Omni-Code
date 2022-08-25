@@ -60,7 +60,7 @@ void setup(){
   int initAttempts=1;
   // Init CAN system
   
-  while(can.init(CAN_1000KBPS)){
+  while(can.init(CAN_250KBPS)){
 #if (debug_mode)
     led.blink(0,255,0,0);
     Serial.printf("CAN init failed! Reattempting try #: %d\n",initAttempts);
