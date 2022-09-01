@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include "mcp_can_2.h"
 #include "CanPacket.h"
+#include <FlexCAN_T4.h>
 class CanNetwork
 {
 public:
@@ -14,8 +15,9 @@ public:
     void debug();
     CanPacket receive();
     void loopback();
+    void initFlexcan(uint32_t baud);
     void setTime(uint64_t unix_time_seconds);
-
+    CanPacket receiveFlexcan();
     MCP_CAN *_CAN;
 private:
     bool _debug;

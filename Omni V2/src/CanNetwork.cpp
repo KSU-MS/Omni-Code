@@ -2,6 +2,7 @@
 #include "CanNetwork.h"
 #include "Arduino.h"
 
+FlexCAN_T4<CAN1,RX_SIZE_256,TX_SIZE_16> FLEXCAN_;
 // The pin here is the board select pin to SPI sometimes marked (SS)
 // Note: you can make this any pin, as long as it's connected to the MCP chip's SS
 CanNetwork::CanNetwork(int pin) : _CAN(new MCP_CAN(pin))
@@ -12,6 +13,19 @@ CanNetwork::CanNetwork(int pin) : _CAN(new MCP_CAN(pin))
 void CanNetwork::debug()
 {
     _debug = true;
+}
+void CanNetwork::initFlexcan(uint32_t baud){
+    FLEXCAN_.begin();
+    FLEXCAN_.setBaudRate(baud);
+    FLEXCAN_.setMaxMB(8);
+    for(int i = 0;i<(8);i++){
+        FLEXCAN_.setMB((FLEXCAN_MAILBOX)i,RX,STD);
+    }
+    FLEXCAN_.mailboxStatus();
+};
+int ReadCAN(CAN_message_t &msg)
+{
+    return FLEXCAN_.read(msg);
 }
 bool CanNetwork::init(uint8_t speed)
 {
@@ -95,3 +109,37 @@ CanPacket CanNetwork::receive()
     }
         return received;
 }
+CanPacket CanNetwork::receiveFlexcan()
+{
+    CanPacket received = {
+        timestamp: 0,
+        id : 0,
+        data : {0, 0, 0, 0, 0, 0, 0, 0},
+        delim : CAN_PACKET_DELIM
+    };
+    CAN_message_t rxMsg;
+    if (ReadCAN(rxMsg)) // Check if can data is avail
+    {
+        received.id = rxMsg.id;
+        memcpy(received.data,rxMsg.buf,sizeof(rxMsg.buf));
+        received.timestamp =  millis();        
+        if (_debug)
+            {
+                Serial.print("CAN PACKET ID: ");
+                Serial.print(received.id);
+                Serial.print(" DATA: ");
+                for (int i = 0; i < rxMsg.len; i++) // print each byte as hex
+                {
+                    Serial.print(received.data[i], HEX);
+                    Serial.print("\t");
+                }
+                Serial.println();
+                CAN_error_t error;
+                if(FLEXCAN_.error(error,1)){
+                    Serial.println("There was an error i guess");
+                }
+            }
+    }
+    return received;
+}
+

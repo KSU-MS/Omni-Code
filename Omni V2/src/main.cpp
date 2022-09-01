@@ -60,23 +60,23 @@ void setup(){
   int initAttempts=1;
   // Init CAN system
   
-  while(can.init(CAN_250KBPS)){
-#if (debug_mode)
-    led.blink(0,255,0,0);
-    Serial.printf("CAN init failed! Reattempting try #: %d\n",initAttempts);
-
- #endif
-    initAttempts++; delay(10); //
-    if(initAttempts>=MAX_ATTEMPTS){
-      Serial.println("Maxed out CAN attempts, breaking..."); //too lazy to put in debug #ifs, should make serial wrapper for debug mode
-      led.setColor(0,255,0,0);
-      break;
-    }
-
-  }; 
+//   while(can.init(CAN_250KBPS)){
+// #if (debug_mode)
+//     led.blink(0,255,0,0);
+//     Serial.printf("CAN init failed! Reattempting try #: %d\n",initAttempts);
+//  #endif
+//     initAttempts++; delay(10); //
+//     if(initAttempts>=MAX_ATTEMPTS){
+//       Serial.println("Maxed out CAN attempts, breaking..."); //too lazy to put in debug #ifs, should make serial wrapper for debug mode
+//       led.setColor(0,255,0,0);
+//       break;
+//     }
+//   }; 
 #if (debug_mode) //dont allow loopback if not at least in debug mode
   //    can.loopback(); /// NOTE DEBUGGING - NOT FOR PROD - WILL NOT LISTEN FOR MESSAGES!!!!!!!
 #endif
+  //init flexcan
+  can.initFlexcan(1000000);
   // Init SD Card
   if (!card.init(10)){
     Serial.println("Error initializing SD card controller");
@@ -114,6 +114,18 @@ void recievePacket()
     packets++;
   }
 }
+void recieveFlexcanPacket()
+{
+  if(power_down) return;
+  CanPacket incoming = can.receiveFlexcan();
+  if(!system_ready) return;
+ if (incoming.timestamp != 0)
+  {
+    //radio.send(&incoming); //DISABLED
+    buffer.push(incoming);
+    packets++;
+  }
+}
 void powerDown()
 {
   noInterrupts();
@@ -127,10 +139,11 @@ void loop(){
 //   return;
 // }
   system_ready = true;
-  recievePacket();
+  //recievePacket();
+  recieveFlexcanPacket();
   while (buffer.blockReady())
   {
-    led.blink(1,0,255,0);
+
     card.writeBlock(buffer.peek());
     buffer.pop();
   }
