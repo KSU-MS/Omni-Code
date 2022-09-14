@@ -138,12 +138,13 @@ void loop(){
 //   led.setColor(0, 255, 0); //commission when ready
 //   return;
 // }
+  digitalWrite(LED_BUILTIN,LOW);
   system_ready = true;
   //recievePacket();
   recieveFlexcanPacket();
   while (buffer.blockReady())
   {
-
+    digitalWrite(LED_BUILTIN,HIGH);
     card.writeBlock(buffer.peek());
     buffer.pop();
   }
